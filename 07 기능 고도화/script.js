@@ -22,14 +22,14 @@ async function sendMessage() {
 
     //사용자의 메시지 가져옴
     const messageInput = document.getElementById('messageInput');
-    const message = messageInput.value;  
+    const message = messageInput.value;
 
     //채팅 말풍선에 사용자의 메시지 출력
     const userBubble = document.createElement('div');
     userBubble.className = 'chat-bubble user-bubble';
     userBubble.textContent = message;
     document.getElementById('fortuneResponse').appendChild(userBubble);
-    
+
     //Push
     userMessages.push(messageInput.value);
 
@@ -38,7 +38,7 @@ async function sendMessage() {
 
     //백엔드 서버에 메시지를 보내고 응답 출력
     try {
-        const response = await fetch('http://localhost:3000/fortuneTell', {
+        const response = await fetch('https://fq6nd66xdcjavmwateaswm263m0goyzk.lambda-url.ap-southeast-2.on.aws/fortuneTell', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -55,10 +55,10 @@ async function sendMessage() {
         }
 
         const data = await response.json();
-        
+
         //로딩 아이콘 숨기기
         document.getElementById('loader').style.display = "none";
-        
+
         //Push
         assistantMessages.push(data.assistant);
         console.log('Response:', data);
@@ -68,8 +68,8 @@ async function sendMessage() {
         botBubble.className = 'chat-bubble bot-bubble';
         botBubble.textContent = data.assistant;
         document.getElementById('fortuneResponse').appendChild(botBubble);
-        
-    
+
+
     } catch (error) {
         console.error('Error:', error);
     }

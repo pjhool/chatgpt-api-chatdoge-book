@@ -1,8 +1,5 @@
-const OpenAI = require('openai');
-
-const openai = new OpenAI({
-    apiKey: "{발급받은 API 키}",
-});
+const MISTRAL_API_KEY = "zQSaH1MajqPmRI4KVST7JOZbB";
+const MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions";
 
 //express 설정
 const express = require('express')
@@ -45,14 +42,31 @@ app.post('/fortuneTell', async function (req, res) {
         }
     }
 
-    const completion = await openai.chat.completions.create({
-        messages: messages,
-        model: "gpt-3.5-turbo"
-    });
+    try {
+        const response = await fetch(MISTRAL_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${MISTRAL_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: "mistral-small-latest",
+                messages: messages
+            })
+        });
 
-    let fortune = completion.choices[0].message['content'];
+        if (!response.ok) {
+            throw new Error(`Mistral API error: ${response.status} ${response.statusText}`);
+        }
 
-    res.json({ "assistant": fortune });
+        const data = await response.json();
+        let fortune = data.choices[0].message.content;
+
+        res.json({ "assistant": fortune });
+    } catch (error) {
+        console.error('Error calling Mistral API:', error);
+        res.status(500).json({ "error": "Failed to get response from Mistral AI" });
+    }
 });
 
 app.listen(3000)
